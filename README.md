@@ -37,14 +37,14 @@ Python 3.11 / FastAPI / SQLAlchemy 2 / PostgreSQL / Redis / Celery / JWT (PyJWT 
 - `app/utils.py`：PDF 头部与大小校验、文本分块。
 - `tests/test_utils.py`：纯函数测试；运行 `docker compose run --rm api pytest -q`。
 
-## 给大厂面试的验证项（需要自己完成）
+## 验证项
 - 产品 API 的正常、404、409、未授权、越权测试；提交至少30个自动化测试用例。
 - Redis Cache hit/miss 比较，固定并发及样本，记录 P50/P95 延迟；真实数值不得伪造。
 - 上传相同文档两次：验证 SHA256 去重，且不会生成第二个处理作业。
 - 模拟 Worker 处理失败：观察状态与重试次数；不要在生产服务中注入故障。
 - 用 Agent 调用 `/api/v1/products/{code}` 查询产品，再通过文档 chunks 做 RAG 问答。
 
-## 这个版本的边界与待改进事项（重要）
+## 此版本的边界与待改进事项
 1. 当前是 **学习用起步项目，不是生产就绪系统**。表创建使用 `create_all`，正式项目应通过 Alembic 管理版本。
 2. 文档上传是内存读取、基础 PDF 头检测；生产应采用流式上传、完整 MIME/恶意文件扫描、隔离转换、配额限制。
 3. 扫描 PDF 无 OCR，处理会标记失败。没有向量索引生成，它应由项目一负责。
@@ -52,7 +52,6 @@ Python 3.11 / FastAPI / SQLAlchemy 2 / PostgreSQL / Redis / Celery / JWT (PyJWT 
 5. API DB 提交与 Celery 投递不是一个事务。这里的 `dispatch_failed` + 人工重投只是教学级兜底，生产需 Transactional Outbox + Dispatcher + 巡检补偿。
 6. Redis 缓存失效与数据库提交之间仍存在非原子窗口；接口限流、数据行级授权、上传内容清洗、日志脱敏、审计追踪、完整集成测试以及分页查询尚待增加。
 7. Docker Compose 中 PostgreSQL 的口令是本地演示凭据；不要直接部署到外网，需替换安全配置并关闭外部端口暴露。
-8. 任何招聘简历的“性能提升XX%”“任务成功率XX%”“已上线”都必须在实际完成并验证后才填写。
 
 ## 顺序请求延迟测量（用于学习，不是并发压测）
 获取一个有效 Token 后，主机环境安装 httpx，再运行：
@@ -63,7 +62,7 @@ python scripts/benchmark.py --token '<JWT_TOKEN>' --code DEMO001 --requests 100
 
 
 ## 作品说明
-这是独立学习用的金融产品后端 MVP，不包含企业内部代码、凭据或真实客户数据。现有基础单元测试不等于完整 Docker/业务集成测试；请运行并完善后再将其列为已完成项目。
+这是独立学习用的金融产品后端 MVP，不包含企业内部代码、凭据或真实客户数据。现有基础单元测试不等于完整 Docker/业务集成测试。
 
 ## 连接 Finance-RAG-Agent
 项目一可通过产品查询、文档文本分块 API 调用此服务。
